@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passion + Bike Mileage Calculator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<style>
+  :root {
+    --primary-blue: #3b82f6;
+    --primary-green: #2ecc71;
+    --primary-orange: #f39c12;
+    --dark-green: #27ae60;
+    --dark-orange: #e67e22;
+    --bg-light: #f1f5f9;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --input-bg: #ffffff;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  body 
+  {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-light);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ☰ Hamburger Menu */
+  .hamburger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: #fff;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+  }
+
+  .hamburger:hover { background: #f8fafc; transform: translateY(-1px); }
+  .hamburger div { width: 22px; height: 3px; background: var(--text-main); border-radius: 2px; }
+
+  /* 🚪 Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    z-index: 1001;
+    box-shadow: 10px 0 40px rgba(0,0,0,0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 100px 25px 25px;
+    box-sizing: border-box;
+  }
+
+  .sidebar.open { left: 0; }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  .sidebar-link:hover { background: #f1f5f9; }
+  .sidebar-link.active { background: var(--primary-blue); color: #fff; }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4);
+    z-index: 1000;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+
+  .overlay.active { display: block; }
+
+  /* 📱 Main Sections */
+  .section { display: none; padding: 100px 20px 40px; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .container {
+    max-width: 480px;
+    width: 100%;
+    margin: auto;
+    background: #fff;
+    padding: 35px;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  h2 { text-align: center; margin-bottom: 30px; font-weight: 800; color: #0f172a; font-size: 26px; letter-spacing: -1px; }
+
+  .field { margin-bottom: 22px; }
+  label { font-size: 12px; font-weight: 700; display: block; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  input, select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-family: inherit;
+  }
+
+  input:focus, select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+  input[readonly] { background: #f8fafc; cursor: not-allowed; }
+
+  button {
+    width: 100%;
+    padding: 16px;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  button:active { transform: scale(0.98); }
+  .btn-save { background: var(--primary-green); }
+  .btn-save:hover { background: var(--dark-green); box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3); }
+  .btn-extract { background: var(--primary-orange); }
+  .btn-extract:hover { background: var(--dark-orange); box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3); }
+
+  .checkbox { display: flex; align-items: center; gap: 10px; margin-top: 10px; cursor: pointer; }
+  .checkbox input { width: 20px; height: 20px; accent-color: var(--primary-blue); }
+  .checkbox span { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+  .result { margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 16px; font-weight: 700; color: #0369a1; text-align: center; border: 2px solid #e0f2fe; }
+
+  .history { margin-top: 40px; border-top: 2px solid var(--border-color); padding-top: 25px; }
+  .history-title { font-size: 15px; font-weight: 800; margin-bottom: 20px; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; }
+
+  .card { padding: 20px; background: #fff; border: 2px solid var(--border-color); border-radius: 18px; margin-bottom: 15px; transition: all 0.2s; }
+  .card:hover { border-color: var(--primary-blue); transform: translateX(5px); }
+  .card-top { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
+  .card-date { font-weight: 800; font-size: 15px; color: #0f172a; }
+  .card-mileage { background: #f0fdf4; color: #166534; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; border: 1px solid #bbf7d0; }
+  .card-details { font-size: 14px; color: var(--text-muted); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* 📊 Analytics Dashboard */
+  .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 25px; }
+  .stat-card { background: #fff; border: 2px solid var(--border-color); padding: 20px; border-radius: 20px; text-align: center; transition: all 0.2s; }
+  .stat-card:hover { border-color: var(--primary-blue); background: #f8fafc; }
+  .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
+  .stat-value { font-size: 20px; font-weight: 800; color: #0f172a; }
+
+  .filter-bar { background: #f8fafc; padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); margin-bottom: 25px; }
+  .filter-controls { display: flex; flex-direction: column; gap: 12px; }
+  .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+</style></style>
+</head>
+
+<body>
+
+<div class="hamburger" onclick="toggleMenu()">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-link active" onclick="showSection('home')">🏠 Home</div>
+  <div class="sidebar-link" onclick="showSection('analytics')">📊 Analytics</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- 🏠 Home Section -->
+<div id="home" class="section active">
+  <div class="container">
+    <h2>Passion Plus Bike Mileage</h2>
+
+    <div class="field">
+      <label>Date</label>
+      <input id="date" readonly placeholder="Selecting date...">
+    </div>
+
+    <div class="field">
+      <label>Previous Odometer</label>
+      <input id="prevOdo" readonly placeholder="Auto-loaded from last entry">
+    </div>
+
+    <div class="field">
+      <label>Current Odometer</label>
+      <input id="currOdo" type="number" placeholder="Enter current reading">
+    </div>
+
+    <div class="field">
+      <label>Distance (km)</label>
+      <input id="distance" readonly placeholder="Calculated automatically">
+    </div>
+
+    <div class="field">
+      <label>Fuel Price (₹/L)</label>
+      <input id="fuelPrice" type="number" step="0.01" placeholder="Enter fuel price per liter">
+      <label class="checkbox" for="samePrice">
+        <input type="checkbox" id="samePrice">
+        <span>Same as previous</span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label>Amount (₹)</label>
+      <input id="amount" type="number" placeholder="Enter total amount paid">
+    </div>
+
+    <div class="field">
+      <label>Fuel Quantity (L)</label>
+      <input id="quantity" readonly placeholder="Calculated automatically">
+    </div>
+
+    <button class="btn-save" onclick="saveData()">Save Record</button>
+    <button class="btn-extract" onclick="calculateAverage()">Extract Lifetime Mileage</button>
+
+    <div class="result" id="result" style="display: none;"></div>
+
+    <div class="history">
+      <div class="history-title">Recent Filling History</div>
+      <div id="history"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 📊 Analytics Section -->
+<div id="analytics" class="section">
+  <div class="container">
+    <h2>Analytics Dashboard</h2>
+
+    <div class="filter-bar">
+      <span class="filter-title">📅 Filter Data</span>
+      <div class="filter-controls">
+        <select id="filterType" class="month-picker" onchange="toggleFilterInputs()">
+          <option value="all">All Time</option>
+          <option value="monthly">By Month</option>
+          <option value="custom">Custom Range</option>
+        </select>
+        
+        <div id="monthlyFilter" style="display:none;">
+          <input type="month" id="filterMonth" class="month-picker" onchange="loadAnalytics()">
+        </div>
+
+        <div id="customFilter" class="date-inputs" style="display:none;">
+          <input type="date" id="filterFrom" onchange="loadAnalytics()">
+          <input type="date" id="filterTo" onchange="loadAnalytics()">
+        </div>
+      </div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Cost</span>
+        <span class="stat-value" id="statCost">₹0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Fuel</span>
+        <span class="stat-value" id="statFuel">0 L</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Distance</span>
+        <span class="stat-value" id="statDistance">0 km</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Avg Mileage</span>
+        <span class="stat-value" id="statMileage">0 km/l</span>
+      </div>
+    </div>
+
+    <div class="history" style="margin-top: 25px;">
+      <div class="history-title">Filtered History</div>
+      <div id="filteredHistory"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let allData = [];
+
+  // 🛠️ Navigation & UI
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("active");
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    
+    document.getElementById(id).classList.add('active');
+    
+    // Update active class in sidebar based on id
+    document.querySelectorAll('.sidebar-link').forEach(l => {
+        if(l.innerText.toLowerCase().includes(id)) l.classList.add('active');
+    });
+
+    if (id === 'analytics') loadAnalytics();
+    toggleMenu();
+  }
+
+  function toggleFilterInputs() {
+    const type = document.getElementById("filterType").value;
+    document.getElementById("monthlyFilter").style.display = type === "monthly" ? "block" : "none";
+    document.getElementById("customFilter").style.display = type === "custom" ? "grid" : "none";
+    loadAnalytics();
+  }
+
+  // 📈 Calculation Logic
+  function calculateDistance() {
+    let prev = parseFloat(document.getElementById("prevOdo").value) || 0;
+    let curr = parseFloat(document.getElementById("currOdo").value) || 0;
+    if (prev === 0) {
+      document.getElementById("distance").value = "0 (Initial Reading)";
+    } else if (curr > prev) {
+      document.getElementById("distance").value = (curr - prev).toFixed(2);
+    } else {
+      document.getElementById("distance").value = "";
+    }
+  }
+
+  function calculateFuel() {
+    let amount = parseFloat(document.getElementById("amount").value) || 0;
+    let price = parseFloat(document.getElementById("fuelPrice").value) || 0;
+    if (amount && price) {
+      document.getElementById("quantity").value = (amount / price).toFixed(2);
+    } else {
+      document.getElementById("quantity").value = "";
+    }
+  }
+
+  // 🔔 Notifications
+  function showNotify(text, type = "success") {
+    Toastify({
+      text: text,
+      duration: 3000,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: type === "success" ? "linear-gradient(to right, #10b981, #059669)" : "linear-gradient(to right, #ef4444, #dc2626)",
+        borderRadius: "14px"
+      }
+    }).showToast();
+  }
+
+  // 🔗 API Logic
+  const API_URL = "http://localhost:5000";
+
+  async function saveData() {
+    const prevOdo = parseFloat(document.getElementById("prevOdo").value) || 0;
+    const currOdo = parseFloat(document.getElementById("currOdo").value);
+
+    let entry = {
+      date: document.getElementById("date").value,
+      prevOdo: prevOdo,
+      currOdo: currOdo,
+      distance: parseFloat(document.getElementById("distance").value) || 0,
+      fuelPrice: parseFloat(document.getElementById("fuelPrice").value) || 0,
+      amount: parseFloat(document.getElementById("amount").value) || 0,
+      quantity: parseFloat(document.getElementById("quantity").value) || 0
+    };
+
+    if (prevOdo === 0) {
+      if (!currOdo) return showNotify("Enter current odometer reading", "error");
+      entry.distance = 0; entry.quantity = 0; entry.amount = 0;
+    } else if (!currOdo || currOdo <= prevOdo) {
+      return showNotify("Invalid odometer reading", "error");
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry)
+      });
+      if (res.ok) {
+        showNotify("Saved successfully!");
+        setTimeout(() => location.reload(), 1000);
+      }
+    } catch (e) { showNotify("Server connection failed", "error"); }
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch(`${API_URL}/data`);
+      allData = await res.json();
+      renderHistory("history", allData.slice().reverse());
+      if (document.getElementById("analytics").classList.contains("active")) loadAnalytics();
+    } catch (e) { console.error(e); }
+  }
+
+  function renderHistory(containerId, data) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = data.length ? "" : "<p style='text-align:center;padding:20px;color:#64748b;font-size:14px;'>No records found for this period.</p>";
+    data.forEach(item => {
+      const mileage = item.quantity > 0 ? (item.distance / item.quantity).toFixed(2) : "REF";
+      container.innerHTML += `
+        <div class="card">
+          <div class="card-top">
+            <span class="card-date">${item.date}</span>
+            <span class="card-mileage">${mileage} km/l</span>
+          </div>
+          <div class="card-details">
+            <span>📍 ${item.distance} km</span>
+            <span>💰 ₹${item.amount}</span>
+            <span>⛽ ${item.quantity.toFixed(1)} L</span>
+            <span>💹 ₹${item.fuelPrice}/L</span>
+          </div>
+        </div>`;
+    });
+  }
+
+  async function loadAnalytics() {
+    const filter = document.getElementById("filterType").value;
+    let filtered = [...allData];
+
+    if (filter === "monthly") {
+      const month = document.getElementById("filterMonth").value;
+      if (month) filtered = allData.filter(d => d.date.startsWith(month));
+    } else if (filter === "custom") {
+      const from = document.getElementById("filterFrom").value;
+      const to = document.getElementById("filterTo").value;
+      if (from && to) filtered = allData.filter(d => d.date >= from && d.date <= to);
+    }
+
+    let totalCost = 0, totalFuel = 0, totalDist = 0;
+    filtered.forEach(d => {
+      totalCost += d.amount;
+      totalFuel += d.quantity;
+      totalDist += d.distance;
+    });
+
+    document.getElementById("statCost").innerText = "₹" + totalCost.toLocaleString();
+    document.getElementById("statFuel").innerText = totalFuel.toFixed(1) + " L";
+    document.getElementById("statDistance").innerText = totalDist.toLocaleString() + " km";
+    document.getElementById("statMileage").innerText = totalFuel > 0 ? (totalDist / totalFuel).toFixed(2) + " km/l" : "0 km/l";
+
+    renderHistory("filteredHistory", filtered.slice().reverse());
+  }
+
+  async function calculateAverage() {
+    const res = await fetch(`${API_URL}/average`);
+    const data = await res.json();
+    const el = document.getElementById("result");
+    el.style.display = "block";
+    el.innerText = `Lifetime Average: ${data.averageMileage.toFixed(2)} km/l`;
+  }
+
+  async function loadLast() {
+    const res = await fetch(`${API_URL}/last`);
+    const last = await res.json();
+    if (last) {
+      document.getElementById("prevOdo").value = last.currOdo;
+      document.getElementById("fuelPrice").value = last.fuelPrice;
+    }
+  }
+
+  function init() {
+    document.getElementById("date").value = new Date().toISOString().split("T")[0];
+    loadLast();
+    loadData();
+    document.getElementById("currOdo").addEventListener("input", calculateDistance);
+    document.getElementById("amount").addEventListener("input", calculateFuel);
+    document.getElementById("fuelPrice").addEventListener("input", calculateFuel);
+    document.getElementById("samePrice").addEventListener("change", (e) => e.target.checked && loadLast());
+  }
+
+  init();
+</script>
+</body>
+</html>
