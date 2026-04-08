@@ -1,15 +1,11 @@
 {
   "name": "bikemcalc",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "type": "module",
+  "description": "Bike Mileage Calculator Backend",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "dev": "vercel dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
