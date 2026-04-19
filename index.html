@@ -429,37 +429,56 @@
   function renderHistory(containerId, data) {
   const container = document.getElementById(containerId);
 
-  const displayData = [...data].reverse(); // only for UI
+  if (!data.length) {
+    container.innerHTML = "<p style='text-align:center;padding:20px;color:#64748b;'>No records found</p>";
+    return;
+  }
 
-  container.innerHTML = data.length
-    ? ""
-    : "<p style='text-align:center;padding:20px;color:#64748b;font-size:14px;'>No records found</p>";
+  // 🔥 Ensure data is sorted by date ascending
+  const sorted = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  displayData.forEach((item) => {
-    const originalIndex = data.findIndex(d => d._id === item._id);
-    const next = data[originalIndex + 1];
+  // 🔥 Prepare result with correct mileage
+  let result = [];
+
+  for (let i = 0; i < sorted.length; i++) {
+    const current = sorted[i];
+    const next = sorted[i + 1];
 
     let mileage = "REF";
     let distance = "-";
 
-    if (next && item.quantity > 0) {
-      distance = next.currOdo - item.currOdo;
-      mileage = (distance / item.quantity).toFixed(2);
+    if (next && current.quantity > 0) {
+      distance = next.currOdo - current.currOdo;
+      mileage = (distance / current.quantity).toFixed(2);
     }
 
+    result.push({
+      ...current,
+      calcDistance: distance,
+      calcMileage: mileage
+    });
+  }
+
+  // 🔥 Reverse only for UI (latest on top)
+  result.reverse();
+
+  container.innerHTML = "";
+
+  result.forEach(item => {
     container.innerHTML += `
       <div class="card">
         <div class="card-top">
           <span class="card-date">${item.date}</span>
-          <span class="card-mileage">${mileage} km/l</span>
+          <span class="card-mileage">${item.calcMileage} km/l</span>
         </div>
         <div class="card-details">
-          <span>📍 ${distance} km</span>
+          <span>📍 ${item.calcDistance} km</span>
           <span>💰 ₹${item.amount}</span>
           <span>⛽ ${item.quantity.toFixed(1)} L</span>
           <span>💹 ₹${item.fuelPrice}/L</span>
         </div>
-      </div>`;
+      </div>
+    `;
   });
 }
 
@@ -476,12 +495,20 @@
       if (from && to) filtered = allData.filter(d => d.date >= from && d.date <= to);
     }
 
-    let totalCost = 0, totalFuel = 0, totalDist = 0;
-    filtered.forEach(d => {
-      totalCost += d.amount;
-      totalFuel += d.quantity;
-      totalDist += d.distance;
-    });
+    let totalCost = 0;
+let totalFuel = 0;
+let totalDist = 0;
+
+const sorted = [...filtered].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+for (let i = 0; i < sorted.length - 1; i++) {
+  const curr = sorted[i];
+  const next = sorted[i + 1];
+
+  totalCost += curr.amount;
+  totalFuel += curr.quantity;
+  totalDist += (next.currOdo - curr.currOdo);
+}
 
     document.getElementById("statCost").innerText = "₹" + totalCost.toLocaleString();
     document.getElementById("statFuel").innerText = totalFuel.toFixed(1) + " L";
