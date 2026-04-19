@@ -50,22 +50,29 @@ app.get("/last", async (req, res) => {
 
 // 📊 Get Average Mileage
 app.get("/average", async (req, res) => {
-  const data = await Mileage.find();
+  const data = await Mileage.find().sort({ date: 1 });
 
   let totalDistance = 0;
   let totalFuel = 0;
 
-  data.forEach(item => {
-    totalDistance += item.distance;
-    totalFuel += item.quantity;
-  });
+  for (let i = 0; i < data.length - 1; i++) {
+    const curr = data[i];
+    const next = data[i + 1];
 
-  const avg = totalDistance / totalFuel;
+    if (curr.quantity > 0) {
+      const distance = next.currOdo - curr.currOdo;
+
+      totalDistance += distance;
+      totalFuel += curr.quantity;
+    }
+  }
+
+  const avg = totalFuel > 0 ? totalDistance / totalFuel : 0;
 
   res.json({
     totalDistance,
     totalFuel,
-    averageMileage: avg || 0
+    averageMileage: avg
   });
 });
 
