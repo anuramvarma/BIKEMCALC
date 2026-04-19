@@ -429,22 +429,31 @@
   function renderHistory(containerId, data) {
     const container = document.getElementById(containerId);
     container.innerHTML = data.length ? "" : "<p style='text-align:center;padding:20px;color:#64748b;font-size:14px;'>No records found for this period.</p>";
-    data.forEach(item => {
-      const mileage = item.quantity > 0 ? (item.distance / item.quantity).toFixed(2) : "REF";
-      container.innerHTML += `
-        <div class="card">
-          <div class="card-top">
-            <span class="card-date">${item.date}</span>
-            <span class="card-mileage">${mileage} km/l</span>
-          </div>
-          <div class="card-details">
-            <span>📍 ${item.distance} km</span>
-            <span>💰 ₹${item.amount}</span>
-            <span>⛽ ${item.quantity.toFixed(1)} L</span>
-            <span>💹 ₹${item.fuelPrice}/L</span>
-          </div>
-        </div>`;
-    });
+    data.forEach((item, index) => {
+  const next = data[index + 1];
+
+  let mileage = "REF";
+  let distance = item.distance;
+
+  if (next && item.quantity > 0) {
+    distance = next.currOdo - item.currOdo;
+    mileage = (distance / item.quantity).toFixed(2);
+  }
+
+  container.innerHTML += `
+    <div class="card">
+      <div class="card-top">
+        <span class="card-date">${item.date}</span>
+        <span class="card-mileage">${mileage} km/l</span>
+      </div>
+      <div class="card-details">
+        <span>📍 ${distance} km</span>
+        <span>💰 ₹${item.amount}</span>
+        <span>⛽ ${item.quantity.toFixed(1)} L</span>
+        <span>💹 ₹${item.fuelPrice}/L</span>
+      </div>
+    </div>`;
+});
   }
 
   async function loadAnalytics() {
