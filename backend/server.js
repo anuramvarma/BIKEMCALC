@@ -38,19 +38,19 @@ app.post("/save", async (req, res) => {
 
 // 📥 Get All Data
 app.get("/data", async (req, res) => {
-  const data = await Mileage.find().sort({ date: 1 });
+  const data = await Mileage.find().sort({ date: 1, currOdo: 1 });
   res.json(data);
 });
 
 // 🔁 Get Last Entry
 app.get("/last", async (req, res) => {
-  const last = await Mileage.findOne().sort({ _id: -1 });
+  const last = await Mileage.findOne().sort({ date: -1, currOdo: -1 });
   res.json(last);
 });
 
 // 📊 Get Average Mileage
 app.get("/average", async (req, res) => {
-  const data = await Mileage.find().sort({ date: 1 });
+  const data = await Mileage.find().sort({ date: 1, currOdo: 1 });
 
   let totalDistance = 0;
   let totalFuel = 0;

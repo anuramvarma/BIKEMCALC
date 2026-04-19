@@ -381,7 +381,9 @@
   }
 
   // 🔗 API Logic
-  const API_URL = "https://bikemcalc.onrender.com";
+  const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+    ? "http://localhost:5000" 
+    : "https://bikemcalc.onrender.com";
 
   async function saveData() {
     const prevOdo = parseFloat(document.getElementById("prevOdo").value) || 0;
@@ -399,7 +401,8 @@
 
     if (prevOdo === 0) {
       if (!currOdo) return showNotify("Enter current odometer reading", "error");
-      entry.distance = 0; entry.quantity = 0; entry.amount = 0;
+      entry.distance = 0; 
+      // Do NOT reset quantity and amount here, as they are needed for the first fuel filling
     } else if (!currOdo || currOdo <= prevOdo) {
       return showNotify("Invalid odometer reading", "error");
     }
@@ -434,8 +437,12 @@
     return;
   }
 
-  // 🔥 Ensure data is sorted by date ascending
-  const sorted = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  // 🔥 Ensure data is sorted by date ascending, then currOdo
+  const sorted = [...data].sort((a, b) => {
+    const dateDiff = new Date(a.date) - new Date(b.date);
+    if (dateDiff !== 0) return dateDiff;
+    return a.currOdo - b.currOdo;
+  });
 
   // 🔥 Prepare result with correct mileage
   let result = [];
@@ -499,7 +506,11 @@
 let totalFuel = 0;
 let totalDist = 0;
 
-const sorted = [...filtered].sort((a, b) => new Date(a.date) - new Date(b.date));
+const sorted = [...filtered].sort((a, b) => {
+  const dateDiff = new Date(a.date) - new Date(b.date);
+  if (dateDiff !== 0) return dateDiff;
+  return a.currOdo - b.currOdo;
+});
 
 for (let i = 0; i < sorted.length - 1; i++) {
   const curr = sorted[i];
