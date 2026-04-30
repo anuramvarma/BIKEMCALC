@@ -20,11 +20,37 @@
     --text-muted: #64748b;
     --border-color: #e2e8f0;
     --input-bg: #ffffff;
-    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --card-bg: #ffffff;
+    --shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    --sidebar-bg: #ffffff;
+    --filter-bg: #f8fafc;
+    --result-bg: #f0f9ff;
+    --result-color: #0369a1;
+    --result-border: #e0f2fe;
+    --mileage-bg: #f0fdf4;
+    --mileage-color: #166534;
+    --mileage-border: #bbf7d0;
   }
 
-  body 
-  {
+  html.dark {
+    --bg-light: #09090b;
+    --text-main: #f4f4f5;
+    --text-muted: #a1a1aa;
+    --border-color: #27272a;
+    --input-bg: #18181b;
+    --card-bg: #18181b;
+    --shadow: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.4);
+    --sidebar-bg: #111113;
+    --filter-bg: #111113;
+    --result-bg: #0c1a2e;
+    --result-color: #93c5fd;
+    --result-border: #1e3a5f;
+    --mileage-bg: #052e16;
+    --mileage-color: #4ade80;
+    --mileage-border: #14532d;
+  }
+
+  body {
     font-family: 'Inter', sans-serif;
     background: var(--bg-light);
     color: var(--text-main);
@@ -32,6 +58,7 @@
     padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
   }
 
   /* ☰ Hamburger Menu */
@@ -40,7 +67,7 @@
     top: 20px;
     left: 20px;
     z-index: 1000;
-    background: #fff;
+    background: var(--card-bg);
     padding: 12px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -51,9 +78,31 @@
     transition: all 0.2s;
     border: 1px solid var(--border-color);
   }
+  .hamburger:hover { background: var(--filter-bg); transform: translateY(-1px); }
+  .hamburger div { width: 22px; height: 3px; background: var(--text-main); border-radius: 2px; transition: background 0.3s; }
 
-  .hamburger:hover { background: #f8fafc; transform: translateY(-1px); }
-  .hamburger div { width: 22px; height: 3px; background: var(--text-main); border-radius: 2px; }
+  /* 🌙 Dark Mode Toggle */
+  .dark-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-family: 'Inter', sans-serif;
+  }
+  .dark-toggle:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
 
   /* 🚪 Sidebar */
   .sidebar {
@@ -62,14 +111,14 @@
     left: -300px;
     width: 300px;
     height: 100vh;
-    background: #fff;
+    background: var(--sidebar-bg);
     z-index: 1001;
     box-shadow: 10px 0 40px rgba(0,0,0,0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s;
     padding: 100px 25px 25px;
     box-sizing: border-box;
+    border-right: 1px solid var(--border-color);
   }
-
   .sidebar.open { left: 0; }
 
   .sidebar-link {
@@ -86,22 +135,18 @@
     cursor: pointer;
     font-size: 15px;
   }
-
-  .sidebar-link:hover { background: #f1f5f9; }
+  .sidebar-link:hover { background: var(--filter-bg); }
   .sidebar-link.active { background: var(--primary-blue); color: #fff; }
 
   .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(15, 23, 42, 0.4);
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(15,23,42,0.4);
     z-index: 1000;
     display: none;
     backdrop-filter: blur(4px);
   }
-
   .overlay.active { display: block; }
 
   /* 📱 Main Sections */
@@ -114,13 +159,15 @@
     max-width: 480px;
     width: 100%;
     margin: auto;
-    background: #fff;
+    background: var(--card-bg);
     padding: 35px;
     border-radius: 28px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    transition: background 0.3s, border-color 0.3s;
   }
 
-  h2 { text-align: center; margin-bottom: 30px; font-weight: 800; color: #0f172a; font-size: 26px; letter-spacing: -1px; }
+  h2 { text-align: center; margin-bottom: 30px; font-weight: 800; color: var(--text-main); font-size: 26px; letter-spacing: -1px; }
 
   .field { margin-bottom: 22px; }
   label { font-size: 12px; font-weight: 700; display: block; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -137,9 +184,9 @@
     color: var(--text-main);
     font-family: inherit;
   }
-
-  input:focus, select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-  input[readonly] { background: #f8fafc; cursor: not-allowed; }
+  input:focus, select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+  input[readonly] { background: var(--filter-bg); cursor: not-allowed; }
+  html.dark select option { background: #18181b; color: #f4f4f5; }
 
   button {
     width: 100%;
@@ -152,51 +199,53 @@
     margin-top: 15px;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
-
   button:active { transform: scale(0.98); }
   .btn-save { background: var(--primary-green); }
-  .btn-save:hover { background: var(--dark-green); box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3); }
+  .btn-save:hover { background: var(--dark-green); box-shadow: 0 8px 20px rgba(46,204,113,0.3); }
   .btn-extract { background: var(--primary-orange); }
-  .btn-extract:hover { background: var(--dark-orange); box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3); }
+  .btn-extract:hover { background: var(--dark-orange); box-shadow: 0 8px 20px rgba(243,156,18,0.3); }
 
   .checkbox { display: flex; align-items: center; gap: 10px; margin-top: 10px; cursor: pointer; }
   .checkbox input { width: 20px; height: 20px; accent-color: var(--primary-blue); }
   .checkbox span { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 
-  .result { margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 16px; font-weight: 700; color: #0369a1; text-align: center; border: 2px solid #e0f2fe; }
+  .result { margin-top: 30px; padding: 20px; background: var(--result-bg); border-radius: 16px; font-weight: 700; color: var(--result-color); text-align: center; border: 2px solid var(--result-border); transition: background 0.3s, color 0.3s, border-color 0.3s; }
 
   .history { margin-top: 40px; border-top: 2px solid var(--border-color); padding-top: 25px; }
-  .history-title { font-size: 15px; font-weight: 800; margin-bottom: 20px; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; }
+  .history-title { font-size: 15px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
 
-  .card { padding: 20px; background: #fff; border: 2px solid var(--border-color); border-radius: 18px; margin-bottom: 15px; transition: all 0.2s; }
+  .card { padding: 20px; background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 18px; margin-bottom: 15px; transition: all 0.2s; }
   .card:hover { border-color: var(--primary-blue); transform: translateX(5px); }
   .card-top { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
-  .card-date { font-weight: 800; font-size: 15px; color: #0f172a; }
-  .card-mileage { background: #f0fdf4; color: #166534; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; border: 1px solid #bbf7d0; }
+  .card-date { font-weight: 800; font-size: 15px; color: var(--text-main); }
+  .card-mileage { background: var(--mileage-bg); color: var(--mileage-color); padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; border: 1px solid var(--mileage-border); }
   .card-details { font-size: 14px; color: var(--text-muted); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   /* 📊 Analytics Dashboard */
   .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 25px; }
-  .stat-card { background: #fff; border: 2px solid var(--border-color); padding: 20px; border-radius: 20px; text-align: center; transition: all 0.2s; }
-  .stat-card:hover { border-color: var(--primary-blue); background: #f8fafc; }
+  .stat-card { background: var(--card-bg); border: 2px solid var(--border-color); padding: 20px; border-radius: 20px; text-align: center; transition: all 0.2s; }
+  .stat-card:hover { border-color: var(--primary-blue); background: var(--filter-bg); }
   .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
-  .stat-value { font-size: 20px; font-weight: 800; color: #0f172a; }
+  .stat-value { font-size: 20px; font-weight: 800; color: var(--text-main); }
 
-  .filter-bar { background: #f8fafc; padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); margin-bottom: 25px; }
+  .filter-bar { background: var(--filter-bg); padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); margin-bottom: 25px; transition: background 0.3s, border-color 0.3s; }
   .filter-controls { display: flex; flex-direction: column; gap: 12px; }
   .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-</style></style>
+</style>
 </head>
 
 <body>
 
 <div class="hamburger" onclick="toggleMenu()">
-  <div></div>
-  <div></div>
-  <div></div>
+  <div></div><div></div><div></div>
 </div>
+
+<button class="dark-toggle" onclick="toggleDark()">
+  <span id="darkIcon">🌙</span>
+  <span id="darkLabel">Dark</span>
+</button>
 
 <div class="sidebar" id="sidebar">
   <div class="sidebar-link active" onclick="showSection('home')">🏠 Home</div>
@@ -214,22 +263,18 @@
       <label>Date</label>
       <input id="date" readonly placeholder="Selecting date...">
     </div>
-
     <div class="field">
       <label>Previous Odometer</label>
       <input id="prevOdo" readonly placeholder="Auto-loaded from last entry">
     </div>
-
     <div class="field">
       <label>Current Odometer</label>
       <input id="currOdo" type="number" placeholder="Enter current reading">
     </div>
-
     <div class="field">
       <label>Distance (km)</label>
       <input id="distance" readonly placeholder="Calculated automatically">
     </div>
-
     <div class="field">
       <label>Fuel Price (₹/L)</label>
       <input id="fuelPrice" type="number" step="0.01" placeholder="Enter fuel price per liter">
@@ -238,12 +283,10 @@
         <span>Same as previous</span>
       </label>
     </div>
-
     <div class="field">
       <label>Amount (₹)</label>
       <input id="amount" type="number" placeholder="Enter total amount paid">
     </div>
-
     <div class="field">
       <label>Fuel Quantity (L)</label>
       <input id="quantity" readonly placeholder="Calculated automatically">
@@ -274,11 +317,9 @@
           <option value="monthly">By Month</option>
           <option value="custom">Custom Range</option>
         </select>
-        
         <div id="monthlyFilter" style="display:none;">
           <input type="month" id="filterMonth" class="month-picker" onchange="loadAnalytics()">
         </div>
-
         <div id="customFilter" class="date-inputs" style="display:none;">
           <input type="date" id="filterFrom" onchange="loadAnalytics()">
           <input type="date" id="filterTo" onchange="loadAnalytics()">
@@ -315,6 +356,23 @@
 <script>
   let allData = [];
 
+  // 🌙 Dark Mode
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('darkIcon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('darkLabel').textContent = isDark ? 'Light' : 'Dark';
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('darkIcon').textContent = '☀️';
+      document.getElementById('darkLabel').textContent = 'Light';
+    }
+  })();
+
   // 🛠️ Navigation & UI
   function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("open");
@@ -324,14 +382,10 @@
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    
     document.getElementById(id).classList.add('active');
-    
-    // Update active class in sidebar based on id
     document.querySelectorAll('.sidebar-link').forEach(l => {
-        if(l.innerText.toLowerCase().includes(id)) l.classList.add('active');
+      if(l.innerText.toLowerCase().includes(id)) l.classList.add('active');
     });
-
     if (id === 'analytics') loadAnalytics();
     toggleMenu();
   }
@@ -401,8 +455,7 @@
 
     if (prevOdo === 0) {
       if (!currOdo) return showNotify("Enter current odometer reading", "error");
-      entry.distance = 0; 
-      // Do NOT reset quantity and amount here, as they are needed for the first fuel filling
+      entry.distance = 0;
     } else if (!currOdo || currOdo <= prevOdo) {
       return showNotify("Invalid odometer reading", "error");
     }
@@ -430,64 +483,50 @@
   }
 
   function renderHistory(containerId, data) {
-  const container = document.getElementById(containerId);
-
-  if (!data.length) {
-    container.innerHTML = "<p style='text-align:center;padding:20px;color:#64748b;'>No records found</p>";
-    return;
-  }
-
-  // 🔥 Ensure data is sorted by date ascending, then currOdo
-  const sorted = [...data].sort((a, b) => {
-    const dateDiff = new Date(a.date) - new Date(b.date);
-    if (dateDiff !== 0) return dateDiff;
-    return a.currOdo - b.currOdo;
-  });
-
-  // 🔥 Prepare result with correct mileage
-  let result = [];
-
-  for (let i = 0; i < sorted.length; i++) {
-    const current = sorted[i];
-    const next = sorted[i + 1];
-
-    let mileage = "REF";
-    let distance = "-";
-
-    if (next && current.quantity > 0) {
-      distance = next.currOdo - current.currOdo;
-      mileage = (distance / current.quantity).toFixed(2);
+    const container = document.getElementById(containerId);
+    if (!data.length) {
+      container.innerHTML = "<p style='text-align:center;padding:20px;color:var(--text-muted);'>No records found</p>";
+      return;
     }
 
-    result.push({
-      ...current,
-      calcDistance: distance,
-      calcMileage: mileage
+    const sorted = [...data].sort((a, b) => {
+      const dateDiff = new Date(a.date) - new Date(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      return a.currOdo - b.currOdo;
+    });
+
+    let result = [];
+    for (let i = 0; i < sorted.length; i++) {
+      const current = sorted[i];
+      const next = sorted[i + 1];
+      let mileage = "REF";
+      let distance = "-";
+      if (next && current.quantity > 0) {
+        distance = next.currOdo - current.currOdo;
+        mileage = (distance / current.quantity).toFixed(2);
+      }
+      result.push({ ...current, calcDistance: distance, calcMileage: mileage });
+    }
+
+    result.reverse();
+    container.innerHTML = "";
+    result.forEach(item => {
+      container.innerHTML += `
+        <div class="card">
+          <div class="card-top">
+            <span class="card-date">${item.date}</span>
+            <span class="card-mileage">${item.calcMileage} km/l</span>
+          </div>
+          <div class="card-details">
+            <span>📍 ${item.calcDistance} km</span>
+            <span>💰 ₹${item.amount}</span>
+            <span>⛽ ${item.quantity.toFixed(1)} L</span>
+            <span>💹 ₹${item.fuelPrice}/L</span>
+          </div>
+        </div>
+      `;
     });
   }
-
-  // 🔥 Reverse only for UI (latest on top)
-  result.reverse();
-
-  container.innerHTML = "";
-
-  result.forEach(item => {
-    container.innerHTML += `
-      <div class="card">
-        <div class="card-top">
-          <span class="card-date">${item.date}</span>
-          <span class="card-mileage">${item.calcMileage} km/l</span>
-        </div>
-        <div class="card-details">
-          <span>📍 ${item.calcDistance} km</span>
-          <span>💰 ₹${item.amount}</span>
-          <span>⛽ ${item.quantity.toFixed(1)} L</span>
-          <span>💹 ₹${item.fuelPrice}/L</span>
-        </div>
-      </div>
-    `;
-  });
-}
 
   async function loadAnalytics() {
     const filter = document.getElementById("filterType").value;
@@ -502,24 +541,20 @@
       if (from && to) filtered = allData.filter(d => d.date >= from && d.date <= to);
     }
 
-    let totalCost = 0;
-let totalFuel = 0;
-let totalDist = 0;
+    let totalCost = 0, totalFuel = 0, totalDist = 0;
+    const sorted = [...filtered].sort((a, b) => {
+      const dateDiff = new Date(a.date) - new Date(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      return a.currOdo - b.currOdo;
+    });
 
-const sorted = [...filtered].sort((a, b) => {
-  const dateDiff = new Date(a.date) - new Date(b.date);
-  if (dateDiff !== 0) return dateDiff;
-  return a.currOdo - b.currOdo;
-});
-
-for (let i = 0; i < sorted.length - 1; i++) {
-  const curr = sorted[i];
-  const next = sorted[i + 1];
-
-  totalCost += curr.amount;
-  totalFuel += curr.quantity;
-  totalDist += (next.currOdo - curr.currOdo);
-}
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const curr = sorted[i];
+      const next = sorted[i + 1];
+      totalCost += curr.amount;
+      totalFuel += curr.quantity;
+      totalDist += (next.currOdo - curr.currOdo);
+    }
 
     document.getElementById("statCost").innerText = "₹" + totalCost.toLocaleString();
     document.getElementById("statFuel").innerText = totalFuel.toFixed(1) + " L";
